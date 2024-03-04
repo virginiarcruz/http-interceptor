@@ -17,33 +17,49 @@ const httpClient = () => {
       headers: Object.fromEntries(response.headers.entries())
     }
     
-    return setInterceptors(updatedResponse);
+    return applyInterceptors(updatedResponse);
   }
+  
 
-  const setInterceptors = async (response) => {
+  const applyInterceptors = async (response) => {
+    // for await
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of
     for (const handler of interceptors.response.handlers) {
       await handler(response);
     }
     return response;
   }
+  
 
   return {
     interceptors,
     get,
+    createInstance() {
+      return httpClient()
+    }
   }
 
 }
 
-const HttpClient = httpClient();
 
 (async () => {
+ const HttpClient = httpClient().createInstance();
+ 
  HttpClient.interceptors.response.use(
     (response) => {
     console.log("Interceptamos o request");
+    response.status = 0;
+    return response;
+  },
+);
+  
+HttpClient.interceptors.response.use(
+    (response) => {
+    console.log("o status é: ", response.status);
     return response;
   },
 );
 
 const response = await HttpClient.get("https://api.github.com/users/virginiarcruz")
-console.log("response", response);
+// console.log("response", response);
 })();
