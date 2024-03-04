@@ -1,15 +1,14 @@
-const HttpClient = {};
-
-HttpClient.interceptors = {
+const httpClient = () => {
+  const interceptors = {
     response: {
       handlers: [],
       use: (handler)  => {
-        HttpClient.interceptors.response.handlers.push(handler);
+        interceptors.response.handlers.push(handler);
       },
     },
-};
+  }
 
-HttpClient.get = async function get(url) {
+  const get = async (url) => {
     const response = await fetch(url);      
     const data = await response.json();
     const updatedResponse = {
@@ -18,15 +17,24 @@ HttpClient.get = async function get(url) {
       headers: Object.fromEntries(response.headers.entries())
     }
     
-    return HttpClient.setInterceptors(updatedResponse);
-  };
-  
-HttpClient.setInterceptors = async function setInterceptors(response) {
-    for (const handler of HttpClient.interceptors.response.handlers) {
+    return setInterceptors(updatedResponse);
+  }
+
+  const setInterceptors = async (response) => {
+    for (const handler of interceptors.response.handlers) {
       await handler(response);
     }
     return response;
-};
+  }
+
+  return {
+    interceptors,
+    get,
+  }
+
+}
+
+const HttpClient = httpClient();
 
 (async () => {
  HttpClient.interceptors.response.use(
@@ -36,6 +44,6 @@ HttpClient.setInterceptors = async function setInterceptors(response) {
   },
 );
 
-const response = await HttpClient.get("https://api.github.com/users/omariosouto")
+const response = await HttpClient.get("https://api.github.com/users/virginiarcruz")
 console.log("response", response);
 })();
