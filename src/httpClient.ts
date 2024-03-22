@@ -1,3 +1,5 @@
+function HttpClientFactory() {
+
 const httpClient = () => {
   const interceptors = {
     response: {
@@ -7,6 +9,7 @@ const httpClient = () => {
       },
     },
   }
+
 
   const sendRequest = async (method, url, data, config) => {
     const response = await fetch(url, {
@@ -62,16 +65,15 @@ const httpClient = () => {
     post,
     put,
     patch,
-    createInstance() {
-      return httpClient()
-    }
   }
+}
 
+  return httpClient();
 }
 
 
 (async () => {
- const HttpClient = httpClient().createInstance();
+ const HttpClient = HttpClientFactory();
  
  HttpClient.interceptors.response.use(
     (response) => {
@@ -88,9 +90,9 @@ HttpClient.interceptors.response.use(
   },
 );
 
-const response = await HttpClient.get("https://api.github.com/users/virginiarcruz"
-);
-console.log("response", response);
+// const response = await HttpClient.get("https://api.github.com/users/virginiarcruz"
+// );
+// console.log("response", response);
 
 
 const bodyData = {
@@ -99,11 +101,11 @@ const bodyData = {
   userId: 1
 };
 
-const addPost = await HttpClient.post("https://jsonplaceholder.typicode.com/posts", bodyData, {
+const postReq = await HttpClient.post("https://jsonplaceholder.typicode.com/posts", bodyData, {
   headers: {
     "Content-Type": "application/json;charset=UTF-8",
     Accept: "application/json, text/plain, */*",
   }
   });
-console.log("addPost", addPost);
+console.log("postReq", postReq.responseData);
 })();
